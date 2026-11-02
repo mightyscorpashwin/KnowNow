@@ -1,0 +1,103 @@
+# Deploys one KnowNow environment: infrastructure, API and web front end.
+parameters:
+  - name: environmentName
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: resourceGroup
+    type: string
+
+jobs:
+  - deployment: deploy_${{ parameters.environmentName }}
+    displayName: Deploy ${{ parameters.environmentName }}
+    environment: knownow-${{ parameters.environmentName }}
+    pool: { vmImage: ubuntu-latest }
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: current
+              artifact: infra
+            - download: current
+              artifact: scripts
+            - download: current
+              artifact: api
+            - download: current
+              artifact: web
+
+            # 1. Infrastructure -------------------------------------------------
+            - task: AzureCLI@2
+              name: infra
+              displayName: Deploy infrastructure (Bicep)
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                addSpnToEnvironment: true
+                inlineScript: |
+                  set -euo pipefail
+                  RG="${{ parameters.resourceGroup }}"
+                  az group create -n "$RG" -l "$(azureLocation)" --tags app=knownow environment=${{ parameters.environmentName }} -o none
+
+                  export KNOWNOW_DEPLOYER_PRINCIPAL_ID=$(az ad sp show --id "$servicePrincipalId" --query id -o tsv 2>/dev/null || echo "")
+                  export KNOWNOW_REVIEWER_EMAILS="$(reviewerEmails)"
+                  export KNOWNOW_REVIEWER_GROUP_ID="$(reviewerGroupId)"
+                  export KNOWNOW_SWA_LOCATION="$(swaLocation)"
+                  export KNOWNOW_OPENAI_LOCATION="$(openAiLocation)"
+
+                  PARAMS="$(Pipeline.Workspace)/infra/env/${{ parameters.environmentName }}.bicepparam"
+                  echo "--- What-if"
+                  az deployment group what-if -g "$RG" -n knownow -p "$PARAMS" --result-format ResourceIdOnly
+                  echo "--- Deploy"
+                  OUT=$(az deployment group create -g "$RG" -n knownow -p "$PARAMS" --query properties.outputs -o json)
+                  for key in functionAppName staticWebAppName staticWebAppHostname keyVaultName; do
+                    value=$(echo "$OUT" | jq -r ".${key}.value")
+                    echo "##vso[task.setvariable variable=${key};isOutput=true]${value}"
+                    echo "$key=$value"
+                  done
+
+            # 2. API --------------------------------------------------------------
+            - task: AzureFunctionApp@2
+              displayName: Deploy Function App
+              inputs:
+                connectedServiceNameARM: ${{ parameters.serviceConnection }}
+                appType: functionAppLinux
+                appName: $(infra.functionAppName)
+                package: $(Pipeline.Workspace)/api/api.zip
+                runtimeStack: 'PYTHON|3.11'
+                deploymentMethod: zipDeploy
+
+            # 3. Web --------------------------------------------------------------
+            - task: AzureCLI@2
+              displayName: Deploy Static Web App
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -euo pipefail
+                  WEB="$(Pipeline.Workspace)/web"
+                  TENANT=$(az account show --query tenantId -o tsv)
+                  sed -i "s/__TENANT_ID__/$TENANT/g" "$WEB/staticwebapp.config.json"
+                  TOKEN=$(az staticwebapp secrets list -n "$(infra.staticWebAppName)" -g "${{ parameters.resourceGroup }}" --query properties.apiKey -o tsv)
+                  npx --yes @azure/static-web-apps-cli@2 deploy "$WEB" --deployment-token "$TOKEN" --env production
+
+            # 4. Single sign-on (once per environment, needs Graph permissions) ---
+            - task: AzureCLI@2
+              displayName: Configure single sign-on
+              condition: and(succeeded(), eq(variables['configureSso'], 'true'))
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: scriptPath
+                scriptPath: $(Pipeline.Workspace)/scripts/setup-sso.sh
+                arguments: ${{ parameters.resourceGroup }} ${{ parameters.environmentName }}
+
+            # 5. Smoke test -------------------------------------------------------
+            - script: |
+                set -euo pipefail
+                URL="https://$(infra.staticWebAppHostname)/"
+                CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+                echo "GET $URL -> $CODE (expect 302 to sign-in, or 200)"
+                [[ "$CODE" == "302" || "$CODE" == "200" ]]
+              displayName: Smoke test

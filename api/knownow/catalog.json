@@ -1,0 +1,325 @@
+{
+  "version": 1,
+  "topics": [
+    {
+      "id": "cloud",
+      "name": "Cloud",
+      "description": "Public cloud platforms: what each offers for compute, storage, networking, serverless, data and security, and how they compare.",
+      "order": 1,
+      "subtopics": [
+        {
+          "id": "azure",
+          "name": "Microsoft Azure",
+          "description": "Microsoft's cloud platform and its core service families.",
+          "generate": true,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "Azure fundamentals core architectural components regions subscriptions resource groups" },
+            { "id": "compute", "name": "Compute", "query": "Azure compute options virtual machines App Service AKS Container Apps choose compute service" },
+            { "id": "storage", "name": "Storage", "query": "Azure Storage options blob files queues tables disks choose storage" },
+            { "id": "networking", "name": "Networking", "query": "Azure networking virtual network load balancer application gateway front door private endpoint" },
+            { "id": "serverless", "name": "Serverless", "query": "Azure serverless Azure Functions Logic Apps Event Grid Container Apps" },
+            { "id": "databases", "name": "Databases", "query": "Azure database options Azure SQL Cosmos DB PostgreSQL choose data store" },
+            { "id": "identity-security", "name": "Identity and security", "query": "Microsoft Entra ID managed identities Azure Key Vault Defender for Cloud security fundamentals" }
+          ]
+        },
+        {
+          "id": "aws",
+          "name": "Amazon Web Services",
+          "description": "AWS service families, mapped to their Azure equivalents.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "AWS to Azure services comparison" },
+            { "id": "compute", "name": "Compute", "query": "compare AWS and Azure compute services" },
+            { "id": "storage", "name": "Storage", "query": "compare AWS and Azure storage services" },
+            { "id": "networking", "name": "Networking", "query": "compare AWS and Azure networking options" },
+            { "id": "serverless", "name": "Serverless", "query": "AWS Lambda compared to Azure Functions" },
+            { "id": "databases", "name": "Databases", "query": "compare AWS and Azure database services" }
+          ]
+        },
+        {
+          "id": "gcp",
+          "name": "Google Cloud",
+          "description": "Google Cloud service families, mapped to their Azure equivalents.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "Google Cloud to Azure services comparison" },
+            { "id": "compute", "name": "Compute", "query": "compare Google Cloud and Azure compute services" },
+            { "id": "storage", "name": "Storage", "query": "compare Google Cloud and Azure storage services" },
+            { "id": "networking", "name": "Networking", "query": "compare Google Cloud and Azure networking" },
+            { "id": "serverless", "name": "Serverless", "query": "Google Cloud Functions compared to Azure Functions" },
+            { "id": "databases", "name": "Databases", "query": "compare Google Cloud and Azure database services" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "name": "AI",
+      "description": "Generative AI, machine learning foundations, Azure AI services, retrieval-augmented generation, agents and responsible AI.",
+      "order": 2,
+      "subtopics": [
+        {
+          "id": "genai-llms",
+          "name": "Generative AI and LLMs",
+          "description": "How large language models work and how to use them well.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "generative AI fundamentals large language models" },
+            { "id": "prompting", "name": "Prompt engineering", "query": "prompt engineering techniques Azure OpenAI" }
+          ]
+        },
+        {
+          "id": "ml-fundamentals",
+          "name": "Machine learning fundamentals",
+          "description": "Core ML concepts, model types and the training lifecycle.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "machine learning fundamentals concepts" }
+          ]
+        },
+        {
+          "id": "azure-ai-services",
+          "name": "Azure AI services",
+          "description": "Azure OpenAI, Azure AI Search, Foundry and the prebuilt AI services.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "Azure AI services overview Microsoft Foundry" },
+            { "id": "azure-openai", "name": "Azure OpenAI", "query": "Azure OpenAI overview models deployments" },
+            { "id": "ai-search", "name": "Azure AI Search", "query": "Azure AI Search overview vector search" }
+          ]
+        },
+        {
+          "id": "rag-agents",
+          "name": "RAG and agents",
+          "description": "Grounding models in your own data, and building agents that use tools.",
+          "generate": false,
+          "areas": [
+            { "id": "rag", "name": "Retrieval-augmented generation", "query": "retrieval augmented generation Azure AI Search" },
+            { "id": "agents", "name": "Agents", "query": "Foundry Agent Service overview tools" }
+          ]
+        },
+        {
+          "id": "responsible-ai",
+          "name": "Responsible AI",
+          "description": "Principles and practical safeguards for AI systems.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "Microsoft responsible AI principles content filtering" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "devops",
+      "name": "DevOps",
+      "description": "Continuous integration and delivery, infrastructure as code, containers, observability and security in the pipeline.",
+      "order": 3,
+      "subtopics": [
+        {
+          "id": "cicd",
+          "name": "CI/CD",
+          "description": "Build, test and release pipelines.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "Azure Pipelines overview continuous integration delivery" },
+            { "id": "strategies", "name": "Release strategies", "query": "deployment strategies blue green canary Azure" }
+          ]
+        },
+        {
+          "id": "iac",
+          "name": "Infrastructure as code",
+          "description": "Bicep, ARM and Terraform for repeatable environments.",
+          "generate": false,
+          "areas": [
+            { "id": "bicep", "name": "Bicep", "query": "Bicep overview infrastructure as code" },
+            { "id": "terraform", "name": "Terraform on Azure", "query": "Terraform on Azure overview" }
+          ]
+        },
+        {
+          "id": "containers-aks",
+          "name": "Containers and AKS",
+          "description": "Containers, registries and Kubernetes on Azure.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "Azure Kubernetes Service core concepts containers" }
+          ]
+        },
+        {
+          "id": "observability",
+          "name": "Observability",
+          "description": "Monitoring, logging, tracing and alerting.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "Azure Monitor Application Insights overview observability" }
+          ]
+        },
+        {
+          "id": "devsecops",
+          "name": "DevSecOps",
+          "description": "Security built into the delivery pipeline.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "DevSecOps on Azure secure supply chain" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backend",
+      "name": "Backend development",
+      "description": "APIs, server-side languages, relational and NoSQL databases, caching, messaging and microservices.",
+      "order": 4,
+      "subtopics": [
+        {
+          "id": "apis",
+          "name": "APIs",
+          "description": "REST, GraphQL and API management.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "RESTful web API design best practices" },
+            { "id": "api-management", "name": "API management", "query": "Azure API Management overview" }
+          ]
+        },
+        {
+          "id": "languages",
+          "name": ".NET, Java and Node",
+          "description": "Server-side runtimes and frameworks.",
+          "generate": false,
+          "areas": [
+            { "id": "dotnet", "name": ".NET", "query": "ASP.NET Core overview" },
+            { "id": "java", "name": "Java", "query": "Java on Azure overview Spring" },
+            { "id": "node", "name": "Node.js", "query": "Node.js on Azure overview" }
+          ]
+        },
+        {
+          "id": "relational-db",
+          "name": "Relational databases",
+          "description": "SQL databases, modelling and performance.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "relational data concepts Azure SQL PostgreSQL" }
+          ]
+        },
+        {
+          "id": "nosql-db",
+          "name": "NoSQL databases",
+          "description": "Document, key-value, graph and column stores.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "non-relational data NoSQL Azure Cosmos DB data modeling" }
+          ]
+        },
+        {
+          "id": "caching-messaging",
+          "name": "Caching and messaging",
+          "description": "Caches, queues and event streaming.",
+          "generate": false,
+          "areas": [
+            { "id": "caching", "name": "Caching", "query": "Azure Managed Redis caching guidance" },
+            { "id": "messaging", "name": "Messaging", "query": "compare Azure messaging services Service Bus Event Hubs Event Grid" }
+          ]
+        },
+        {
+          "id": "microservices",
+          "name": "Microservices",
+          "description": "Designing and running distributed services.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "microservices architecture style Azure" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "legacy",
+      "name": "Legacy modernization",
+      "description": "Mainframe, AS/400, HP NonStop and legacy Java/.NET estates, their languages and databases, and the paths to modernize them.",
+      "order": 5,
+      "subtopics": [
+        {
+          "id": "mainframe",
+          "name": "Mainframe (IBM z)",
+          "description": "z/OS, CICS, JCL and batch, and how mainframe workloads move to Azure.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "mainframe migration overview Azure" },
+            { "id": "migration", "name": "Migration to Azure", "query": "mainframe rehost refactor Azure architecture" }
+          ]
+        },
+        {
+          "id": "as400",
+          "name": "AS/400 (IBM i)",
+          "description": "IBM i platform, RPG and its modernization options.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "IBM i AS/400 migration to Azure" }
+          ]
+        },
+        {
+          "id": "legacy-java-dotnet",
+          "name": "Legacy Java and .NET",
+          "description": "Older Java EE and .NET Framework applications and how to modernize them.",
+          "generate": false,
+          "areas": [
+            { "id": "dotnet-framework", "name": ".NET Framework", "query": "modernize .NET Framework applications to Azure" },
+            { "id": "java-ee", "name": "Java EE", "query": "migrate Java EE applications to Azure" }
+          ]
+        },
+        {
+          "id": "hp-nonstop",
+          "name": "HP NonStop (Tandem)",
+          "description": "Fault-tolerant NonStop systems and migration considerations.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "HP NonStop Tandem migration Azure" }
+          ]
+        },
+        {
+          "id": "cobol",
+          "name": "COBOL",
+          "description": "The COBOL language, its runtime environment and modernization.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "COBOL applications modernization Azure" }
+          ]
+        },
+        {
+          "id": "pl1",
+          "name": "PL/I",
+          "description": "The PL/I language and modernization approaches.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "PL/I mainframe application migration" }
+          ]
+        },
+        {
+          "id": "db2",
+          "name": "Db2",
+          "description": "IBM Db2 and migrating it to Azure data services.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "Db2 migration to Azure SQL" }
+          ]
+        },
+        {
+          "id": "ims",
+          "name": "IMS",
+          "description": "IBM IMS hierarchical database and transaction manager.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "IMS DB mainframe database migration Azure" }
+          ]
+        },
+        {
+          "id": "patterns",
+          "name": "Modernization patterns",
+          "description": "Rehost, replatform, refactor, rearchitect and replace.",
+          "generate": false,
+          "areas": [
+            { "id": "overview", "name": "Overview", "query": "Cloud Adoption Framework modernize rehost refactor rearchitect" }
+          ]
+        }
+      ]
+    }
+  ]
+}

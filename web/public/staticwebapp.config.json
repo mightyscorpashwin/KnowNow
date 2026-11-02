@@ -1,0 +1,37 @@
+{
+  "auth": {
+    "rolesSource": "/api/GetRoles",
+    "identityProviders": {
+      "azureActiveDirectory": {
+        "userDetailsClaim": "preferred_username",
+        "registration": {
+          "openIdIssuer": "https://login.microsoftonline.com/__TENANT_ID__/v2.0",
+          "clientIdSettingName": "AZURE_CLIENT_ID",
+          "clientSecretSettingName": "AZURE_CLIENT_SECRET"
+        }
+      }
+    }
+  },
+  "routes": [
+    { "route": "/.auth/login/github", "statusCode": 404 },
+    { "route": "/.auth/login/x", "statusCode": 404 },
+    { "route": "/.auth/login/aad", "allowedRoles": ["anonymous", "authenticated"] },
+    { "route": "/api/GetRoles", "allowedRoles": ["anonymous", "authenticated"] },
+    { "route": "/api/admin/*", "allowedRoles": ["reviewer"] },
+    { "route": "/review*", "allowedRoles": ["reviewer"] },
+    { "route": "/*", "allowedRoles": ["authenticated"] }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/api/*", "/assets/*", "*.{svg,png,ico,css,js,json}"]
+  },
+  "responseOverrides": {
+    "401": { "redirect": "/.auth/login/aad?post_login_redirect_uri=.referrer", "statusCode": 302 },
+    "403": { "rewrite": "/index.html" }
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "X-Frame-Options": "DENY"
+  }
+}

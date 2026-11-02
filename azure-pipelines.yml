@@ -1,0 +1,134 @@
+# KnowNow CI/CD — Azure DevOps multi-stage pipeline
+#
+# Build -> Dev -> Test -> Prod. Each environment stage runs the same template:
+# Bicep what-if + deploy, Function App deploy, Static Web App deploy.
+# Add approvals and checks to the Azure DevOps environments
+# 'knownow-test' and 'knownow-prod' (Pipelines > Environments).
+
+trigger:
+  branches:
+    include: [main]
+
+pr:
+  branches:
+    include: [main]
+
+# Service connection names must be known when the pipeline is compiled, so they
+# are pipeline parameters. Create Azure Resource Manager service connections
+# with these names (or change the defaults).
+parameters:
+  - name: devServiceConnection
+    type: string
+    default: knownow-dev
+  - name: testServiceConnection
+    type: string
+    default: knownow-test
+  - name: prodServiceConnection
+    type: string
+    default: knownow-prod
+
+variables:
+  - group: knownow-common        # see README: azureLocation, reviewer settings
+  - name: pythonVersion
+    value: '3.11'
+  - name: nodeVersion
+    value: '22.x'
+
+stages:
+  - stage: Build
+    displayName: Build and test
+    jobs:
+      - job: api
+        displayName: API (Python)
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - task: UsePythonVersion@0
+            inputs: { versionSpec: '$(pythonVersion)' }
+          - script: |
+              python -m pip install --upgrade pip
+              pip install -r requirements-dev.txt
+              ruff check .
+              pytest tests --junitxml=$(Build.ArtifactStagingDirectory)/test-results.xml
+            workingDirectory: api
+            displayName: Lint and unit tests
+          - task: PublishTestResults@2
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results.xml'
+              testRunTitle: API unit tests
+          - script: |
+              pip install --target=".python_packages/lib/site-packages" -r requirements.txt
+            workingDirectory: api
+            displayName: Install runtime packages for deployment
+          - task: ArchiveFiles@2
+            displayName: Package Function App
+            inputs:
+              rootFolderOrFile: api
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: '$(Build.ArtifactStagingDirectory)/api/api.zip'
+          - script: zip -d $(Build.ArtifactStagingDirectory)/api/api.zip "tests/*" "requirements-dev.txt" "local.settings.sample.json" || true
+            displayName: Remove test files from package
+          - publish: $(Build.ArtifactStagingDirectory)/api
+            artifact: api
+
+      - job: web
+        displayName: Web (React)
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - task: NodeTool@0
+            inputs: { versionSpec: '$(nodeVersion)' }
+          - script: |
+              npm install --no-audit --no-fund
+              npm run build
+            workingDirectory: web
+            displayName: Type-check and build
+          - publish: web/dist
+            artifact: web
+
+      - job: infra
+        displayName: Infrastructure (Bicep)
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - script: |
+              az bicep install
+              az bicep lint --file infra/main.bicep
+              az bicep build --file infra/main.bicep --stdout > /dev/null
+            displayName: Lint and build Bicep
+          - publish: infra
+            artifact: infra
+          - publish: scripts
+            artifact: scripts
+
+  - stage: Dev
+    displayName: Deploy to Dev
+    dependsOn: Build
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - template: pipelines/deploy.yml
+        parameters:
+          environmentName: dev
+          serviceConnection: ${{ parameters.devServiceConnection }}
+          resourceGroup: $(devResourceGroup)
+
+  - stage: Test
+    displayName: Deploy to Test
+    dependsOn: Dev
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - template: pipelines/deploy.yml
+        parameters:
+          environmentName: test
+          serviceConnection: ${{ parameters.testServiceConnection }}
+          resourceGroup: $(testResourceGroup)
+
+  - stage: Prod
+    displayName: Deploy to Prod
+    dependsOn: Test
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - template: pipelines/deploy.yml
+        parameters:
+          environmentName: prod
+          serviceConnection: ${{ parameters.prodServiceConnection }}
+          resourceGroup: $(prodResourceGroup)
