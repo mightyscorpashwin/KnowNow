@@ -2,6 +2,7 @@ import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api";
 import { useLoad } from "../hooks";
+import { formatDateTime } from "../format";
 import type { RunStatus, Topic } from "../types";
 
 const DONE = new Set(["Completed", "Failed", "Terminated"]);
@@ -124,7 +125,7 @@ export default function Review() {
               <Link to={`/review/${d.topicId}/${d.pageId}`}>{d.title || d.pageId}</Link>
               <span className="meta">
                 {d.subtopicId} / {d.areaName}
-                {d.generatedAt && `, drafted ${new Date(d.generatedAt).toLocaleString()}`}
+                {d.generatedAt && `, drafted ${formatDateTime(d.generatedAt)}`}
               </span>
               {!d.checks.passed && <span className="flag">Failed {d.checks.problems.length} checks</span>}
             </li>

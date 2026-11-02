@@ -110,7 +110,19 @@ To enable more sub-topics for scheduled drafting, set `"generate": true` in `api
 
 With private networking on, deployment scripts on hosted agents cannot reach Key Vault, so `setup-sso.sh` skips storing the secret there and still configures the Static Web App.
 
-## Local development
+## Try it locally without Azure (demo mode)
+
+The demo server runs the same API routes with an in-memory store, one published sample page (Azure compute options) and instant demo drafts, so you can click through the whole reader and review flow. It needs only Python 3.11+ and Node.js; no Azure account.
+
+```bash
+cd web && npm install && npm run build && cd ..
+cd api && python devserver.py --web ../web/dist
+# open http://localhost:7071
+```
+
+You are signed in as `demo.reviewer@contoso.com`, a reviewer. Run with `DEMO_REVIEWER=false` to see the reader view. If you set `AZURE_OPENAI_ENDPOINT` (and are signed in with `az login`), "Draft pages" uses the real Microsoft Learn and Azure OpenAI pipeline instead of demo drafts.
+
+## Local development against Azure
 
 ```bash
 # API

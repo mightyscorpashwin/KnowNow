@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import PageBody from "../components/PageBody";
 import { useLoad } from "../hooks";
+import { formatDateTime, plural } from "../format";
 import { topicColor } from "../topicColors";
 
 export default function ReviewDraft() {
@@ -46,7 +47,7 @@ export default function ReviewDraft() {
             <p>All automated checks passed.</p>
           ) : (
             <>
-              <p>Automated checks found {d.checks.problems.length} problems:</p>
+              <p>Automated checks found {plural(d.checks.problems.length, "problem", "problems")}:</p>
               <ul>
                 {d.checks.problems.map((p) => (
                   <li key={p}>{p}</li>
@@ -56,8 +57,8 @@ export default function ReviewDraft() {
           )}
         </div>
         <p className="meta">
-          Drafted {new Date(d.generation.generatedAt).toLocaleString()} with deployment “{d.generation.model}”, prompt{" "}
-          {d.generation.promptVersion}. Built from {d.generation.fetchedSources.length} Microsoft Learn pages.
+          Drafted {formatDateTime(d.generation.generatedAt)} with deployment “{d.generation.model}”, prompt{" "}
+          {d.generation.promptVersion}. Built from {plural(d.generation.fetchedSources.length, "Microsoft Learn page", "Microsoft Learn pages")}.
         </p>
         {d.status === "rejected" && d.review && (
           <p className="meta">

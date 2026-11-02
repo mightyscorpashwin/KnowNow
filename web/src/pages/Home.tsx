@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { api } from "../api";
 import { useLoad } from "../hooks";
+import { plural } from "../format";
 import { topicColor } from "../topicColors";
 
 export default function Home() {
@@ -27,7 +28,7 @@ export default function Home() {
                 <span className="topic-name">{t.name}</span>
                 <span className="topic-desc">{t.description}</span>
                 <span className="topic-count">
-                  {t.subtopicCount} {t.subtopicCount === 1 ? "sub-topic" : "sub-topics"}
+                  {plural(t.subtopicCount, "sub-topic", "sub-topics")}
                 </span>
               </Link>
             </li>

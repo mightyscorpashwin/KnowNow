@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import PageBody from "../components/PageBody";
 import { useLoad } from "../hooks";
+import { formatDate } from "../format";
 import { topicColor } from "../topicColors";
 
 export default function PageView() {
@@ -11,7 +12,7 @@ export default function PageView() {
   if (page.loading) return <p className="notice">Loading…</p>;
   if (page.error || !page.data) return <p className="notice error">{page.error ?? "Page not found."}</p>;
   const p = page.data;
-  const reviewed = p.review?.at ? new Date(p.review.at).toLocaleDateString() : null;
+  const reviewed = p.review?.at ? formatDate(p.review.at) : null;
 
   return (
     <div style={{ ["--topic" as string]: topicColor(topicId) }}>
